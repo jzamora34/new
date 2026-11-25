@@ -1,0 +1,12 @@
+// Playbook A2: alert when an AI agent reaches a destination outside its 14-day baseline.
+// Assumes gateway or proxy logs in a table with AgentName and DestinationHost columns.
+// Rename AgentEgressLogs and the columns to match your schema before deploying.
+let baselineWindow = 14d;
+let lookback = 1h;
+let Baseline = AgentEgressLogs
+    | where TimeGenerated between (ago(baselineWindow + lookback) .. ago(lookback))
+    | summarize by AgentName, DestinationHost;
+AgentEgressLogs
+| where TimeGenerated > ago(lookback)
+| join kind=leftanti Baseline on AgentName, DestinationHost
+| summarize FirstSeen = min(TimeGenerated), Requests = count() by AgentName, DestinationHost

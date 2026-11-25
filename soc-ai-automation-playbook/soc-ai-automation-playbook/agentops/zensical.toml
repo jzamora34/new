@@ -1,0 +1,4 @@
+[project]
+site_name = "Agent Operations Center"
+site_description = "Local AI governance and productivity pilot"
+nav = [{"Home" = "index.md"}, {"Installation" = "install.md"}, {"Operations" = "operations.md"}, {"Governance" = "governance.md"}, {"Evaluation and ROI" = "evaluation.md"}, {"Roadmap" = "roadmap.md"}, {"References" = "references.md"}]

@@ -1,0 +1,12 @@
+// Playbook A4: flag agents whose hourly token use exceeds 3x their 7-day hourly median.
+// Assumes gateway logs with AgentName and TotalTokens columns; rename to match your schema.
+let History = AgentGatewayLogs
+    | where TimeGenerated between (ago(7d) .. ago(1h))
+    | summarize Tokens = sum(TotalTokens) by AgentName, bin(TimeGenerated, 1h)
+    | summarize MedianHourly = percentile(Tokens, 50) by AgentName;
+AgentGatewayLogs
+| where TimeGenerated > ago(1h)
+| summarize LastHour = sum(TotalTokens) by AgentName
+| join kind=inner History on AgentName
+| where MedianHourly > 0 and LastHour > 3 * MedianHourly
+| project AgentName, LastHour, MedianHourly, Ratio = round(todouble(LastHour) / MedianHourly, 1)

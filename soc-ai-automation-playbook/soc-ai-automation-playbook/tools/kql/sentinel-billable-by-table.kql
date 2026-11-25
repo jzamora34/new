@@ -1,0 +1,7 @@
+// Playbook C1 step 1: billed volume per table over 30 days.
+// Export the result with the run date as baseline evidence.
+Usage
+| where TimeGenerated > ago(30d) and IsBillable == true
+| summarize BilledGB = sum(Quantity) / 1000.0, Days = dcount(bin(TimeGenerated, 1d)) by DataType
+| extend AvgGBPerDay = BilledGB / Days
+| top 20 by BilledGB desc
